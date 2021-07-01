@@ -1,5 +1,6 @@
 package com.hugosilva.curso.ws.domain;
 
+import com.hugosilva.curso.ws.dto.UserDTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -48,10 +49,19 @@ public class User {
         this.email = email;
     }
 
+    public  User() { }
+
     public User(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+    }
+
+    public User(UserDTO userDTO) {
+        this.id = userDTO.getId();
+        this.firstName = userDTO.getFirstName();
+        this.lastName = userDTO.getLastName();
+        this.email = userDTO.getEmail();
     }
 
     @Override
