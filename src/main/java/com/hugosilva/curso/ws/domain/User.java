@@ -2,8 +2,11 @@ package com.hugosilva.curso.ws.domain;
 
 import com.hugosilva.curso.ws.dto.UserDTO;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Document()
@@ -16,6 +19,9 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
+
+    @DBRef(lazy = true)
+    private List<Role> roles = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -49,7 +55,22 @@ public class User {
         this.email = email;
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
     public  User() { }
+
+    public User(String id, String firstName, String lastName, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
 
     public User(String firstName, String lastName, String email) {
         this.firstName = firstName;
