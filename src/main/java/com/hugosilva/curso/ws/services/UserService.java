@@ -40,7 +40,9 @@ public class UserService {
                 userRepository.save(new User(   item.getId(),
                                                 user.getFirstName(),
                                                 user.getLastName(),
-                                                user.getEmail())))
+                                                user.getEmail(),
+                                                user.getPassword(),
+                                                user.isEnabled())))
                                 .orElseThrow(() -> new ObjectNotFoundException("User not found."));
     }
 
