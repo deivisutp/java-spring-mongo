@@ -1,6 +1,11 @@
 package com.hugosilva.curso.ws.dto;
 
+import com.hugosilva.curso.ws.domain.Role;
 import com.hugosilva.curso.ws.domain.User;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDTO {
 
@@ -11,6 +16,12 @@ public class UserDTO {
     private String lastName;
     private String email;
 
+    private String password;
+    private boolean enabled;
+
+    @DBRef(lazy = true)
+    private List<Role> roles = new ArrayList<>();
+
     public UserDTO() { }
 
     public UserDTO(User user) {
@@ -18,6 +29,8 @@ public class UserDTO {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
+        this.enabled = user.isEnabled();
+        this.roles = user.getRoles();
     }
 
     public String getId() {
@@ -50,5 +63,29 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

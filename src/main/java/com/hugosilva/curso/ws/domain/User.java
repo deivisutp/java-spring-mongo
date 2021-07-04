@@ -81,6 +81,7 @@ public class User {
         this.enabled = enabled;
     }
 
+
     public  User() { }
 
     public User(String id, String firstName, String lastName, String email, String password, boolean enabled) {
@@ -103,6 +104,7 @@ public class User {
         this.firstName = userDTO.getFirstName();
         this.lastName = userDTO.getLastName();
         this.email = userDTO.getEmail();
+        this.password = userDTO.getPassword();
     }
 
     public User(User user) {

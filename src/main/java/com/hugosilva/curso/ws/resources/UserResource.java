@@ -6,8 +6,14 @@ import com.hugosilva.curso.ws.dto.UserDTO;
 import com.hugosilva.curso.ws.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +25,11 @@ public class UserResource {
 
     @Autowired
     UserService userService;
+
+    TokenStore tokenStore = new InMemoryTokenStore();
+
+    @Autowired
+    DefaultTokenServices tokenServices = new DefaultTokenServices();
 
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> findAll() {
@@ -61,4 +72,26 @@ public class UserResource {
 
         return ResponseEntity.ok().body(user.getRoles());
     }
+
+    @GetMapping(value = "/users/main")
+    public ResponseEntity<UserDTO> getUserEmail(Principal principal) {
+        User user = this.userService.findByEmail(principal.getName());
+        UserDTO userDTO = new UserDTO(user);
+        userDTO.setPassword("");
+        return ResponseEntity.ok().body(userDTO);
+    }
+
+    @GetMapping(value = "/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null) {
+            String tokenValue = authHeader.replace("Bearer","").trim();
+            OAuth2AccessToken accessToken = tokenServices.readAccessToken(tokenValue);
+            tokenStore.removeAccessToken(accessToken);
+            tokenServices.revokeToken(String.valueOf(accessToken));
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
