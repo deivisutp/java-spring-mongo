@@ -6,16 +6,14 @@ import com.hugosilva.curso.ws.dto.UserDTO;
 import com.hugosilva.curso.ws.repository.RoleRepository;
 import com.hugosilva.curso.ws.repository.UserRepository;
 import com.hugosilva.curso.ws.repository.VerificationTokenRepository;
+import com.hugosilva.curso.ws.services.email.EmailService;
 import com.hugosilva.curso.ws.services.exception.ObjectAlreadyExistsException;
 import com.hugosilva.curso.ws.services.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -31,6 +29,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -71,7 +72,10 @@ public class UserService {
         if (emailExists(user.getEmail())) throw new ObjectAlreadyExistsException(String.format("Email already registered."));
 
         user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER").get()));
+        user.setEnabled(false);
         user = create(user);
+        this.emailService.sendConfirmationHtmlEmail(user, null);
+
         return user;
     }
 
@@ -107,5 +111,14 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         return user.orElseThrow(() -> new ObjectNotFoundException(String.format("Usuário não encontrado!")));
+    }
+
+    public VerificationToken generateNewVerificationToken(String email) {
+        User user = this.findByEmail(email);
+        Optional<VerificationToken> vToken = verificationTokenRepository.findByUser(user);
+        vToken.get().updateToken(UUID.randomUUID().toString());
+        VerificationToken updateVToken = verificationTokenRepository.save(vToken.get());
+        emailService.sendConfirmationHtmlEmail(user, updateVToken);
+        return updateVToken;
     }
 }

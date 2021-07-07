@@ -90,4 +90,9 @@ public class VerificationToken implements Serializable {
         return new Date(calendar.getTime().getTime());
     }
 
+    public void updateToken(final String token) {
+        this.token = token;
+        this.expireDate = calculateExpiryDate(EXPIRATION);
+    }
+
 }

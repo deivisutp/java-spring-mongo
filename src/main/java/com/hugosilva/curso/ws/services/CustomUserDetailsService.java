@@ -3,6 +3,7 @@ package com.hugosilva.curso.ws.services;
 import com.hugosilva.curso.ws.domain.Role;
 import com.hugosilva.curso.ws.domain.User;
 import com.hugosilva.curso.ws.repository.UserRepository;
+import com.hugosilva.curso.ws.services.exception.ObjectNotEnabledException;
 import com.hugosilva.curso.ws.services.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         if (!optionalUser.get().isEnabled()) {
-            throw new ObjectNotFoundException(String.format("User not enabled."));
+            throw new ObjectNotEnabledException(String.format("User not enabled."));
         }
 
         return new UserRepositoryUserDetails(optionalUser.get());
