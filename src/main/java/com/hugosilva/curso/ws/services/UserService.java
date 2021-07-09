@@ -74,7 +74,7 @@ public class UserService {
         user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER").get()));
         user.setEnabled(false);
         user = create(user);
-        this.emailService.sendConfirmationHtmlEmail(user, null);
+        this.emailService.sendConfirmationHtmlEmail(user, null, 0);
 
         return user;
     }
@@ -113,12 +113,19 @@ public class UserService {
         return user.orElseThrow(() -> new ObjectNotFoundException(String.format("Usuário não encontrado!")));
     }
 
-    public VerificationToken generateNewVerificationToken(String email) {
+    public VerificationToken generateNewVerificationToken(String email, int select) {
         User user = this.findByEmail(email);
+        VerificationToken newToken;
         Optional<VerificationToken> vToken = verificationTokenRepository.findByUser(user);
-        vToken.get().updateToken(UUID.randomUUID().toString());
-        VerificationToken updateVToken = verificationTokenRepository.save(vToken.get());
-        emailService.sendConfirmationHtmlEmail(user, updateVToken);
+        if (vToken.isPresent()) {
+            vToken.get().updateToken(UUID.randomUUID().toString());
+            newToken = vToken.get();
+        } else {
+            newToken = new VerificationToken(UUID.randomUUID().toString(), user);
+        }
+
+        VerificationToken updateVToken = verificationTokenRepository.save(newToken);
+        emailService.sendConfirmationHtmlEmail(user, updateVToken, select);
         return updateVToken;
     }
 }

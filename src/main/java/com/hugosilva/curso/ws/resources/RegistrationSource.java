@@ -33,7 +33,13 @@ public class RegistrationSource {
 
     @GetMapping(value = "/resendRegistrationToken/users")
     public ResponseEntity<Void> resendRegistrationToken(@RequestParam("email") String email) {
-        this.userService.generateNewVerificationToken(email);
+        this.userService.generateNewVerificationToken(email, 0);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/resetPassword/users")
+    public ResponseEntity<Void> resetPassword(@RequestParam("email") final String email) {
+        this.userService.generateNewVerificationToken(email, 1);
         return ResponseEntity.noContent().build();
     }
 }
