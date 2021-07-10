@@ -128,4 +128,32 @@ public class UserService {
         emailService.sendConfirmationHtmlEmail(user, updateVToken, select);
         return updateVToken;
     }
+
+    public String validatePasswordResetToke(String idUser, String token) {
+        final Optional<VerificationToken> vToken = verificationTokenRepository.findByToken(token);
+        if (!vToken.isPresent()) {
+            return "invalidToken";
+        }
+
+        if (!vToken.get().getUser().getId().equals(idUser)) {
+            return "invalidToken";
+        }
+
+        final Calendar cal = Calendar.getInstance();
+        if ((vToken.get().getExpireDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return "expiredToken";
+        }
+
+        return null;
+    }
+
+    public VerificationToken getVerificationTokenByToken(String token) {
+        return verificationTokenRepository.findByToken(token).orElseThrow(() ->
+                new ObjectNotFoundException(String.format("Token not found.")));
+    }
+
+    public void changeUserPassword(User user, String password) {
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }
