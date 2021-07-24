@@ -48,7 +48,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**")
                 .antMatchers( "/api/public/**")
-                .antMatchers("/v2/api-docs", "/configuration/ui", "/swaggerresources/**", "/configuration/**",
-                "/swagger-ui.html", "/webjars/**");
+                .antMatchers("/api/logout/**");
     }
 }
